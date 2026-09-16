@@ -1,10 +1,10 @@
 # Template rendered by scripts/release/compose-cask.sh from the signed release manifest: edit the
 # shape here, never the version or the digest.
 cask "pz-base" do
-  version "0.4.4"
-  sha256 "ed2183b540e56df411cb495c78b142a33affa09b693cd8f9d4fc94357beeeda2"
+  version "0.4.5"
+  sha256 "5c1796a862e0be8d4098197e91d61be48b34aa83a2baadd457f6d899439d05db"
 
-  url "https://packages.playerzero.app/macos/releases/0.4.4/pz-base-0.4.4-aarch64-apple-darwin.dmg"
+  url "https://packages.playerzero.app/macos/releases/0.4.5/pz-base-0.4.5-aarch64-apple-darwin.dmg"
   name "PlayerZero Base"
   desc "PlayerZero Base local executor"
   homepage "https://playerzero.ai"
@@ -41,10 +41,13 @@ cask "pz-base" do
   # version's executable while the ones on disk still name the last one. Advisory: a Mac that
   # cannot register its agents is still a successful install of the app.
   postflight do
-    # Only an upgrade has agents to reload. A first install has no config yet, and `service start`
-    # canonicalizes one before it does anything, so running it here would print that refusal over
-    # an install that worked.
-    next unless File.exist?(File.expand_path("~/Library/LaunchAgents/app.playerzero.base.plist"))
+    # Keyed on the config and not on the agents: `uninstall launchctl:` deletes the plists before
+    # this runs, so guarding on one of those would skip the reload on every upgrade -- the case it
+    # exists for. The config is what `service start` needs (it canonicalizes one before it does
+    # anything, and refuses when there is none), and `~/.pz` survives an upgrade untouched. A first
+    # install has no `~/.pz` at all, so the refusal is still never printed over an install that
+    # worked.
+    next unless File.exist?(File.expand_path("~/.pz/config.toml"))
 
     system_command "#{appdir}/PlayerZero Base.app/Contents/MacOS/pz-base",
                    args:         ["service", "start", "--force"],
