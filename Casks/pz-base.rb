@@ -1,10 +1,10 @@
 # Template rendered by scripts/release/compose-cask.sh from the signed release manifest: edit the
 # shape here, never the version or the digest.
 cask "pz-base" do
-  version "0.4.7"
-  sha256 "7f90ae5e52866780815b05df9e425a2c215d60f6a97cbf7bec95899a525089a4"
+  version "0.4.8"
+  sha256 "8196ffdf0b1765a946b91f5f3bb07517fa1cac1b8b794340e73c44001e8dc3c4"
 
-  url "https://packages.playerzero.app/macos/releases/0.4.7/pz-base-0.4.7-aarch64-apple-darwin.dmg"
+  url "https://packages.playerzero.app/macos/releases/0.4.8/pz-base-0.4.8-aarch64-apple-darwin.dmg"
   name "PlayerZero Base"
   desc "PlayerZero Base local executor"
   homepage "https://playerzero.ai"
