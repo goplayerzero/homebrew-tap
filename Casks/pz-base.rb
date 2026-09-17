@@ -1,10 +1,10 @@
 # Template rendered by scripts/release/compose-cask.sh from the signed release manifest: edit the
 # shape here, never the version or the digest.
 cask "pz-base" do
-  version "0.4.8"
-  sha256 "8196ffdf0b1765a946b91f5f3bb07517fa1cac1b8b794340e73c44001e8dc3c4"
+  version "0.4.9"
+  sha256 "6b10bd322406075b22c4d188ca56f529342ef9795fda8777993cdc93ae5df93d"
 
-  url "https://packages.playerzero.app/macos/releases/0.4.8/pz-base-0.4.8-aarch64-apple-darwin.dmg"
+  url "https://packages.playerzero.app/macos/releases/0.4.9/pz-base-0.4.9-aarch64-apple-darwin.dmg"
   name "PlayerZero Base"
   desc "PlayerZero Base local executor"
   homepage "https://playerzero.ai"
@@ -40,18 +40,21 @@ cask "pz-base" do
   # non-interactive route -- bare `pz-base` prompts. `--force` because the rendered units name this
   # version's executable while the ones on disk still name the last one. Advisory: a Mac that
   # cannot register its agents is still a successful install of the app.
-  postflight do
+  postflight_steps do
     # Keyed on the config and not on the agents: `uninstall launchctl:` deletes the plists before
     # this runs, so guarding on one of those would skip the reload on every upgrade -- the case it
     # exists for. The config is what `service start` needs (it canonicalizes one before it does
     # anything, and refuses when there is none), and `~/.pz` survives an upgrade untouched. A first
     # install has no `~/.pz` at all, so the refusal is still never printed over an install that
     # worked.
-    next unless File.exist?(File.expand_path("~/.pz/config.toml"))
-
-    system_command "#{appdir}/PlayerZero Base.app/Contents/MacOS/pz-base",
-                   args:         ["service", "start", "--force"],
-                   must_succeed: false
+    if_path_exists "~/.pz/config.toml" do
+      # `base:` rather than an interpolated `appdir`: a steps block only permits interpolation of
+      # the cask's own name, token, arch and version, so `#{appdir}` here is an offence.
+      run "PlayerZero Base.app/Contents/MacOS/pz-base",
+          base:         :appdir,
+          args:         ["service", "start", "--force"],
+          must_succeed: false
+    end
   end
 
   uninstall quit:      "ai.playerzero.base",
