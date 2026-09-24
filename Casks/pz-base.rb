@@ -47,18 +47,23 @@ cask "pz-base" do
     "~/Library/Logs/playerzero-base",
   ]
 
-  caveats <<~EOS
-    Register this Mac and start it in the background:
-      pz-base
-
-    It prompts for an enrollment token. Get one from the Bases page in PlayerZero:
-      https://playerzero.ai/current-org/settings/bases
-
-    Upgrade with `brew upgrade --cask pz-base`; the agents re-register themselves afterwards.
-    Stop the agents before removing it:
-      pz-base stop
-
-    Already running Base from the curl installer? This cask takes its agents over and replaces
-    its auto-update with `brew upgrade`.
-  EOS
+  # One instruction, because `pz-base` asks for everything else it needs: it prompts for the
+  # enrollment token and links to the page that issues one. Anything repeated here would be read
+  # after every install and every upgrade, and would be a second place to keep current.
+  #
+  # Boxed and coloured to match the installer Portal serves, so arriving either way looks like
+  # arriving at the same product. Homebrew decides whether colour is wanted -- piped output and
+  # NO_COLOR both turn it off -- and the rule is measured against the plain text, since the
+  # escapes occupy no columns.
+  caveats do
+    instruction = "Run 'pz-base' to connect this machine to PlayerZero"
+    rule = "\u2500" * (instruction.length + 2)
+    orange = Tty.color? ? "\e[38;2;230;85;50m" : ""
+    reset = Tty.color? ? "\e[0m" : ""
+    <<~EOS
+      #{orange}\u256d#{rule}\u256e#{reset}
+      #{orange}\u2502#{reset} #{instruction} #{orange}\u2502#{reset}
+      #{orange}\u2570#{rule}\u256f#{reset}
+    EOS
+  end
 end
